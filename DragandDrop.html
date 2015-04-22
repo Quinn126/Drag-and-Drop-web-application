@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Drag and Drop</title>
+	<style>
+	/* Style Sheet */
+	.container {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 1em;
+	}
+	body {
+   	margin:0;
+   	padding:0;
+  	}
+	#thedroparea{
+    padding: 25px;
+    border: 25px solid;
+    margin: 25px;
+    width: 80%;
+	}	
+	.over {
+	background: #F7F7F7;
+	}
+
+	/* CSS of list elements */
+	ul, li{
+		list-style-type: none;
+		margin:0; 
+	}
+	.list {
+    	overflow: hidden;
+    	position: relative;  
+    	width: 100%;
+    	margin: 0 20px 0 0;
+    	display: inline-block;
+	}
+	</style>
+	<script>
+	/* Javascript Sheet */
+	window.onload = function() {
+	var dropBlock = document.querySelector('#thedroparea');
+	var fileContentPane = document.querySelector('#file-content');
+	var arr = {};
+	// Event Listener for when the dragged file is over the drop zone.
+	dropBlock.addEventListener('dragover', function(e) {
+		if (e.preventDefault) e.preventDefault(); 
+		if (e.stopPropagation) e.stopPropagation(); 
+		e.dataTransfer.dropEffect = 'copy';
+	});
+	// Event Listener for when the dragged file enters the drop zone.
+	dropBlock.addEventListener('dragenter', function(e) {
+		this.className = "over";
+	});
+	// Event Listener for when the dragged file leaves the drop zone.
+	dropBlock.addEventListener('dragleave', function(e) {
+		this.className = "";
+	});
+	// Event Listener for when the dragged file dropped in the drop zone.
+	dropBlock.addEventListener('drop', function(e) {
+		if (e.preventDefault) e.preventDefault(); 
+		if (e.stopPropagation) e.stopPropagation(); 
+		this.className = "";
+		var fileList = e.dataTransfer.files;
+		if (fileList.length > 0) {
+			readTextFile(fileList[0]);
+		}
+	});	
+	// Read the file.
+	function readTextFile(file) {
+		var reader = new FileReader();
+		reader.onloadend = function(e) {
+			if (e.target.readyState == FileReader.DONE) {		
+				var size = file.size;
+				var name = file.name;
+				//Name List
+				var nameList = document.getElementById("names"); //get unordered list
+    			var newNameItem = document.createElement("li"); // create new li element
+    			/* We want names to be on the right, sizes on the left: therefore we make two DOMs seperately for styling. */
+    			var NameNode = document.createElement("SPAN");//NameNode
+    			var text = document.createTextNode(name);
+    			NameNode.appendChild(text);
+    			NameNode.style.color = "#F5AE20";
+    			newNameItem.appendChild(NameNode); 
+    			NameNode.style.position = "absolute";
+    			var SizeNode = document.createElement("SPAN");//SizeNode
+    			var text2 = document.createTextNode(" " + size + " Bytes");
+    			SizeNode.appendChild(text2);
+    			SizeNode.style.marginLeft = "700px";
+    			SizeNode.style.textAlign = "right";
+    			newNameItem.appendChild(SizeNode); // append textNode
+   				nameList.appendChild(newNameItem); // append li element to list
+    			var names = nameList.querySelectorAll("li");
+    			names = Array.prototype.slice.call(names).sort(function(a, b) {
+        		  return a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
+    		     }).forEach(function(name) {
+        			nameList.appendChild(name);
+    			});		
+    		 // Update Message
+			document.getElementById("message").innerHTML = "\n\n After Dragging In " + name;	
+			}
+		}	
+    reader.readAsBinaryString(file);
+	}
+	};
+	</script>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Drag and Drop</h1>
+		<p id="message"></p>	
+		<div id= "thedroparea">Drop your file here</div>	
+		<h1>Your Files Table</h1>	
+  			<ul class="list" id="names"></ul>		
+</body>
+
+</html>
